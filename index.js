@@ -1,6 +1,7 @@
 const fs = require('fs');
+const http =require('http');
 
-
+////////////////////////FILES///////////////////
 // //BLOCKING: Función syncrona, espera a que se ejecute una línea de código para pasar a la siguiente
 // const textInput=fs.readFileSync('./txt/input.txt','utf-8');
 // //console.log(textInput);
@@ -24,3 +25,10 @@ const fs = require('fs');
 //     });
 // });
 // console.log("hi from out");
+////////////////////////SERVER///////////////////
+const server = http.createServer(((req, res) => {
+    res.end('Hello from server')
+}));
+server.listen(3000,()=>{
+    console.log("listen on port 3000");
+});
