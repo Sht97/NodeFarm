@@ -26,16 +26,46 @@ const url = require('url');
 // });
 // console.log("hi from out");
 ////////////////////////SERVER///////////////////
-const jsonFile=fs.readFileSync(`${__dirname}/dev-data/data.json`,'utf-8');
+replaceTemplate = (tempCard,el)=> {
+    let output=tempCard.replace(/{%productName%}/g,el.productName);
+    output=output.replace(/{%image%}/g,el.image);
+    output=output.replace(/{%price%}/g,el.price);
+    output=output.replace(/{%from%}/g,el.from);
+    output=output.replace(/{%nutrients%}/g,el.nutrients);
+    output=output.replace(/{%quantity%}/g,el.quantity);
+    output=output.replace(/{%description%}/g,el.description);
+    output=output.replace(/{%id%}/g,el.id);
+    if(!el.organic) output=output.replace(/{%NOT_ORGANIC%}/g,'not-organic');
+    return output;
+};
+
+let  jsonFile=JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data.json`,'utf-8'));
+const tempOverview=fs.readFileSync(`${__dirname}/templates/overview.html`,'utf-8');
+const tempProduct=fs.readFileSync(`${__dirname}/templates/product.html`,'utf-8');
+const tempCard=fs.readFileSync(`${__dirname}/templates/card.html`,'utf-8');
 
 const server = http.createServer((req, res) => {
     const path=req.url;
+
+    //Overview page
     if(path === '/overview' ||path === '/'){
-        res.end('this is a OVERVIEW')
+
+        res.writeHead(200,{
+            'Content-type':'text/html'
+        });
+        const cardsHtml=jsonFile.map(el=>replaceTemplate(tempCard,el)).join('');
+        const output=tempOverview.replace('{%productCards%}',cardsHtml);
+        res.end(output);
     }
+
+
+    //Product page
     else if(path === '/product'){
         res.end('Hello from product page')
     }
+
+
+    //Api
     else if(path === '/API'){
         res.writeHead(200,{
             'Content-type':'application/json'
@@ -43,6 +73,7 @@ const server = http.createServer((req, res) => {
         res.end(jsonFile);
     }
 
+    //Not found
     else {
         res.writeHead(404,{
             'Content-type':'text/html',
