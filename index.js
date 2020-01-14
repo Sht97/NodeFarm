@@ -12,7 +12,6 @@ const tempCard=fs.readFileSync(`${__dirname}/templates/card.html`,'utf-8');
 
 const server = http.createServer((req, res) => {
     const {query , pathname}=url.parse(req.url,true);
-
     //Overview page
     if(pathname === '/overview' ||pathname === '/'){
 
@@ -28,9 +27,17 @@ const server = http.createServer((req, res) => {
     //Product page
     else if(pathname === '/product'){
         const product=jsonFile[query.id];
-
-        const output=replaceTemplate(tempProduct,product);
-        res.end(output);
+        if(product){
+            const output=replaceTemplate(tempProduct,product);
+            res.end(output);
+        }
+        else {
+            res.writeHead(404,{
+            'Content-type':'text/html',
+            'My-own-header':'Hello-World'
+            });
+            res.end('<h1>404 product not found</h1>');
+        }
     }
 
     //Api
